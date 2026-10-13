@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@theme {
+  --color-page: #000000;
+  --color-page-alt: #0B0B0C;
+  --color-surface: #111113;
+  --color-surface-raised: #1A1A1D;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+
+  --color-gold: #C9A24B;
+  --color-gold-light: #E6C77A;
+  --color-gold-dark: #8F6F2A;
+
+  --color-text-primary: #F5F5F7;
+  --color-text-secondary: #A1A1A6;
+  --color-text-muted: #86868B;
+
+  --color-stone-panel: #EDE8DF;
+
+  --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  overflow-x: clip;
+  max-width: 100vw;
+  background-color: #000000;
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+  background-color: #000000;
+  color: #A1A1A6;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.022em;
+  overflow-x: clip;
+}
+
+/* Headings: weight 600, letter-spacing -0.03em, line-height 1.05, text-wrap balance, color #F5F5F7 */
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #F5F5F7;
+  text-wrap: balance;
+}
+
+/* Accessible visible focus indicator */
+*:focus-visible {
+  outline: 2px solid #C9A24B;
+  outline-offset: 2px;
+}
+
+/* Micro-labels: 12px, weight 600, uppercase, letter-spacing 0.08em, gold */
+.micro-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #C9A24B;
+}
+
+/* Gold Gradient Pill Button: border-radius 980px, gold gradient with black text */
+.btn-gold-primary {
+  background: linear-gradient(135deg, #E6C77A 0%, #C9A24B 100%);
+  color: #000000;
+  font-weight: 600;
+  border-radius: 980px;
+  transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-gold-primary:hover {
+  filter: brightness(1.08);
+  transform: scale(1.02);
+  box-shadow: 0 4px 20px rgba(201, 162, 75, 0.28);
+}
+
+/* Secondary Gold Link with "›" */
+.btn-gold-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #C9A24B;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.btn-gold-secondary:hover {
+  color: #E6C77A;
+  transform: translateX(2px);
+}
+
+/* Content visibility optimization for offscreen sections */
+#finishes {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
+}
+
+#about {
+  content-visibility: auto;
+  contain-intrinsic-size: 850px;
+}
+
+footer {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
+}
+
+/* Lenis smooth scrolling reset */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Apple-style Staggered Scroll Reveal Motion */
+.reveal-ready [data-reveal],
+.reveal-ready .reveal-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-ready [data-reveal].is-revealed,
+.reveal-ready .reveal-item.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal],
+  .reveal-ready .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+

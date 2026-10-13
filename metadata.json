@@ -1,0 +1,6 @@
+{
+  "name": "DECORIUM Hardware Zone",
+  "description": "Premium architectural hardware in Lahore, Pakistan — door handles, pulls, bolts, finials and plates for homes and interiors.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
