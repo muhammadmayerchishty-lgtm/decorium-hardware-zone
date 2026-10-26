@@ -77,9 +77,9 @@ export default function SafeImage({
             decoding="async"
             onLoad={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
-            className={`max-w-full max-h-full object-contain transition-all duration-500 ease-out ${
+            className={`w-full h-full object-contain p-2 sm:p-3 transition-transform duration-500 ease-out ${
               isLoaded ? 'opacity-100' : 'opacity-0'
-            } ${isZoomable && isHovered ? 'scale-105' : 'scale-100'} ${
+            } ${isZoomable && isHovered ? 'scale-[1.01]' : 'scale-100'} ${
               opaque
                 ? '[mix-blend-mode:multiply]'
                 : 'drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]'

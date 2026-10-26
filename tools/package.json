@@ -1,0 +1,11 @@
+{
+  "name": "decorium-catalog-audit-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "audit": "node audit-images.mjs"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}

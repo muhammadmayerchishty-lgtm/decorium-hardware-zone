@@ -21,6 +21,7 @@ export default function ScrollFeatureShowcase() {
   const handleGroupRef = useRef<any>(null);
   const materialRef = useRef<any>(null);
   const threeModuleRef = useRef<any>(null);
+  const reportedProgressRef = useRef(0);
 
   // Colors to interpolate
   const BRASS_HEX = 0xc9a24b;
@@ -50,7 +51,13 @@ export default function ScrollFeatureShowcase() {
       if (containerHeight <= 0) return;
 
       const progress = Math.min(1, Math.max(0, -rect.top / containerHeight));
-      setScrollProgress(progress);
+      // The WebGL model can update every scroll event, but React only needs a
+      // coarse value for labels and opacity. Throttling those state updates
+      // prevents a full section re-render for every wheel tick.
+      if (Math.abs(progress - reportedProgressRef.current) >= 0.01 || progress === 0 || progress === 1) {
+        reportedProgressRef.current = progress;
+        setScrollProgress(progress);
+      }
 
       // Update 3D rotation and color if active
       if (handleGroupRef.current && threeModuleRef.current && materialRef.current) {
@@ -257,9 +264,9 @@ export default function ScrollFeatureShowcase() {
               </div>
 
               {/* Dynamic Headline */}
-              <div className="relative min-h-[90px] sm:min-h-[110px]">
+              <div className="grid">
                 <h2
-                  className={`text-[clamp(2rem,4vw,3.5rem)] font-heading font-semibold text-[#F5F5F7] tracking-[-0.03em] leading-[1.05] transition-opacity duration-500 absolute inset-0 ${
+                  className={`col-start-1 row-start-1 text-[clamp(2rem,4vw,3.5rem)] font-heading font-semibold text-[#F5F5F7] tracking-[-0.03em] leading-[1.05] transition-opacity duration-500 ${
                     isBrassDominant ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
                 >
@@ -267,7 +274,7 @@ export default function ScrollFeatureShowcase() {
                   <span className="bg-gradient-to-r from-[#E6C77A] to-[#C9A24B] bg-clip-text text-transparent">Warm, brushed gold.</span>
                 </h2>
                 <h2
-                  className={`text-[clamp(2rem,4vw,3.5rem)] font-heading font-semibold text-[#F5F5F7] tracking-[-0.03em] leading-[1.05] transition-opacity duration-500 absolute inset-0 ${
+                  className={`col-start-1 row-start-1 text-[clamp(2rem,4vw,3.5rem)] font-heading font-semibold text-[#F5F5F7] tracking-[-0.03em] leading-[1.05] transition-opacity duration-500 ${
                     !isBrassDominant ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
                 >
@@ -277,16 +284,16 @@ export default function ScrollFeatureShowcase() {
               </div>
 
               {/* Dynamic Body Paragraph */}
-              <div className="relative min-h-[90px]">
+              <div className="grid">
                 <p
-                  className={`text-base text-[#A1A1A6] leading-relaxed transition-opacity duration-500 absolute inset-0 ${
+                  className={`col-start-1 row-start-1 text-base text-[#A1A1A6] leading-relaxed transition-opacity duration-500 ${
                     isBrassDominant ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
                 >
                   Our signature satin brass finish features linear surface brushing with a clear protective coat that maintains its warm luster over time.
                 </p>
                 <p
-                  className={`text-base text-[#A1A1A6] leading-relaxed transition-opacity duration-500 absolute inset-0 ${
+                  className={`col-start-1 row-start-1 text-base text-[#A1A1A6] leading-relaxed transition-opacity duration-500 ${
                     !isBrassDominant ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   }`}
                 >

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { motion } from 'motion/react';
+import { memo } from 'react';
 import { Product } from '../data/products.ts';
 import SafeImage from './SafeImage.tsx';
 
@@ -22,16 +22,9 @@ const FINISH_COLOR_CHIPS: Record<string, string> = {
   Steel: '#94A3B8',
 };
 
-export default function ProductCard({ product, onSelect, onQuickEnquire }: ProductCardProps) {
+function ProductCard({ product, onSelect, onQuickEnquire }: ProductCardProps) {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ duration: 0.45, ease: [0.25, 0.1, 0.25, 1] }}
-      className="w-full"
-    >
+    <div className="w-full">
       {/* 
         Collection card: rounded 28px, 32px padding (p-8 on sm+ screens),
         No heavy tilt, smooth hover interaction
@@ -50,7 +43,6 @@ export default function ProductCard({ product, onSelect, onQuickEnquire }: Produ
             category={product.category}
             finish={product.finish}
             opaque={product.opaque}
-            isZoomable
           />
 
           {/* Category Micro-tag */}
@@ -103,6 +95,8 @@ export default function ProductCard({ product, onSelect, onQuickEnquire }: Produ
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
+
+export default memo(ProductCard);

@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SlidersHorizontal, ArrowUpDown, X } from 'lucide-react';
-import { Product, PRODUCTS, CategoryFilter, FinishFilter, CATEGORIES_LIST, FINISHES_LIST } from '../data/products.ts';
+import { Product, products, CategoryFilter, FinishFilter, CATEGORIES_LIST, FINISHES_LIST } from '../data/products.ts';
 import ProductCard from './ProductCard.tsx';
 import SplitHeading from './SplitHeading.tsx';
 
@@ -20,6 +20,7 @@ interface TheCollectionProps {
 }
 
 type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'name-asc';
+const PRODUCTS_PER_PAGE = 24;
 
 export default function TheCollection({
   selectedCategory,
@@ -39,10 +40,11 @@ export default function TheCollection({
 
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [mobileFinishSheetOpen, setMobileFinishSheetOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_PAGE);
 
   // Filter & Sort Pipeline
   const filteredProducts = useMemo(() => {
-    let list = [...PRODUCTS];
+    let list = [...products];
 
     if (selectedCategory !== 'All') {
       list = list.filter((p) => p.category === selectedCategory);
@@ -68,6 +70,17 @@ export default function TheCollection({
 
     return list;
   }, [selectedCategory, selectedFinish, sortBy]);
+
+  // Keep the initial DOM small. This is substantially lighter than mounting
+  // and animating every product card when a collection filter changes.
+  useEffect(() => {
+    setVisibleCount(PRODUCTS_PER_PAGE);
+  }, [selectedCategory, selectedFinish, sortBy]);
+
+  const visibleProducts = useMemo(
+    () => filteredProducts.slice(0, visibleCount),
+    [filteredProducts, visibleCount],
+  );
 
   const handleResetFilters = () => {
     onSelectCategory('All');
@@ -196,13 +209,9 @@ export default function TheCollection({
 
         {/* 4-Column Responsive Product Grid */}
         {filteredProducts.length > 0 ? (
-          <motion.div
-            layout
-            data-reveal
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredProducts.map((product) => (
+          <>
+            <div data-reveal className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {visibleProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -210,8 +219,19 @@ export default function TheCollection({
                   onQuickEnquire={onQuickEnquire}
                 />
               ))}
-            </AnimatePresence>
-          </motion.div>
+            </div>
+            {visibleProducts.length < filteredProducts.length && (
+              <div className="mt-10 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((count) => count + PRODUCTS_PER_PAGE)}
+                  className="min-h-[44px] px-6 py-2.5 rounded-full border border-white/[0.12] bg-[#111113] text-xs font-semibold uppercase tracking-wider text-[#F5F5F7] transition-colors hover:border-[#C9A24B]/60 hover:text-[#C9A24B]"
+                >
+                  Load more ({filteredProducts.length - visibleProducts.length} remaining)
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           /* Elegant Apple-Style Empty State */
           <div className="py-24 text-center bg-[#111113] rounded-[24px] border border-white/[0.08] max-w-lg mx-auto p-8">

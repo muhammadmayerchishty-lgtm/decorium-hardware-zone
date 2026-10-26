@@ -1,0 +1,95 @@
+{
+  "total": 125,
+  "category": {
+    "accessories": 2,
+    "cabinet-handles": 23,
+    "decorative-handles": 28,
+    "door-handles": 39,
+    "knobs": 6,
+    "main-door-pulls": 19,
+    "mortise-locks": 8
+  },
+  "action": {
+    "crop": 38,
+    "flag": 13,
+    "keep": 40,
+    "reshoot": 1,
+    "whiten": 33
+  },
+  "quality": {
+    "good": 124,
+    "low": 1
+  },
+  "duplicates": 2,
+  "with_text_or_logo": 14,
+  "reshoot": [
+    66
+  ],
+  "flag": [
+    {
+      "id": 42,
+      "file": "WhatsApp Image 2026-10-22 at 1.33.16 AM.jpeg",
+      "notes": "Brand/catalog artwork with dense text."
+    },
+    {
+      "id": 60,
+      "file": "WhatsApp Image 2026-10-22 at 12.11.45 AM (2).jpeg",
+      "notes": "Prominent finish caption embedded in image."
+    },
+    {
+      "id": 70,
+      "file": "WhatsApp Image 2026-10-22 at 12.46.25 AM.jpeg",
+      "notes": "Third-party branded promotional page."
+    },
+    {
+      "id": 86,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.04 AM (2).jpeg",
+      "notes": "Visible watermark across product."
+    },
+    {
+      "id": 89,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.05 AM.jpeg",
+      "notes": "Third-party branded promotional page."
+    },
+    {
+      "id": 93,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.07 AM (1).jpeg",
+      "notes": "Brand logo and product name embedded."
+    },
+    {
+      "id": 94,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.07 AM (2).jpeg",
+      "notes": "Brand logo and product name embedded."
+    },
+    {
+      "id": 100,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.09 AM (2).jpeg",
+      "notes": "Brand logo and product name embedded."
+    },
+    {
+      "id": 104,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.11 AM (1).jpeg",
+      "notes": "Catalog layout with specifications and text."
+    },
+    {
+      "id": 106,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.11 AM.jpeg",
+      "notes": "Catalog layout with specifications and text."
+    },
+    {
+      "id": 109,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.12 AM.jpeg",
+      "notes": "Catalog layout and visible brand logo."
+    },
+    {
+      "id": 111,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.13 AM (2).jpeg",
+      "notes": "Brand logo and product name embedded."
+    },
+    {
+      "id": 113,
+      "file": "WhatsApp Image 2026-10-22 at 12.54.14 AM.jpeg",
+      "notes": "Catalog layout with specifications and text."
+    }
+  ]
+}

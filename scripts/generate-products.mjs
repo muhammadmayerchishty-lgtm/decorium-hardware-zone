@@ -3,182 +3,114 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT_DIR = path.resolve(__dirname, '..');
+const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const IMAGES_DIR = path.join(ROOT_DIR, 'public', 'images');
-const OUTPUT_FILE = path.join(ROOT_DIR, 'src', 'data', 'generated-products.ts');
+const CLEAN_IMAGES_DIR = path.join(ROOT_DIR, 'public', 'images-clean');
+const OUTPUT_FILE = path.join(ROOT_DIR, 'src', 'data', 'catalog.json');
+const IMAGE_EXTENSIONS = new Set(['.webp', '.png', '.jpg', '.jpeg']);
+const CATEGORY_BY_FOLDER = {
+  accessories: 'accessories',
+  'cabinet-handles': 'cabinet-handles',
+  'decorative-handles': 'decorative-handles',
+  'door-handles': 'door-handles',
+  knobs: 'knobs',
+  'main-door-pulls': 'main-door-pulls',
+  'mortise-locks': 'mortise-locks',
+  // These photos do not have reliable product metadata. They are still
+  // saleable hardware, so expose them under the safe fallback category.
+  uncategorized: 'accessories',
+};
 
-function determineCategory(tokens) {
-  if (tokens.some((t) => t === 'tower' || t === 'bolt')) return 'Tower Bolts';
-  if (tokens.some((t) => t === 'finial')) return 'Finials';
-  if (tokens.some((t) => t === 'plate' || t === 'shell')) return 'Plates';
-  if (tokens.some((t) => t === 'mortise' || t === 'lock')) return 'Mortise Locks';
-  if (tokens.some((t) => t === 'knocker')) return 'Door Knockers';
-  if (tokens.some((t) => t === 'disc')) return 'Decorative Handles';
-  if (tokens.some((t) => t === 'pull' || t === 'bar' || t === 'ringed')) return 'Pulls';
-  return 'Handles';
+const toPosixPath = (value) => value.split(path.sep).join('/');
+
+function titleCase(value) {
+  return value.split(/[-_\s]+/).filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 }
 
-function determineFinish(tokens) {
-  if (tokens.some((t) => t === 'gold' || t === 'brass' || t === 'yellow')) return 'Gold';
-  if (tokens.some((t) => t === 'black' || t === 'dark')) return 'Black';
-  if (tokens.some((t) => t.startsWith('silv'))) return 'Silver';
-  if (tokens.some((t) => t === 'steel')) return 'Steel';
-  if (tokens.some((t) => t === 'antique' || t === 'bronze')) return 'Antique';
-  return 'Brass';
+function finishFromFilename(filename) {
+  const name = filename.toLowerCase();
+  if (/antique|bronze/.test(name)) return 'antique';
+  if (/black|dark|graphite/.test(name)) return 'black';
+  if (/silver|nickel/.test(name)) return 'silver';
+  if (/steel/.test(name)) return 'steel';
+  if (/gold|brass|yellow/.test(name)) return 'gold';
+  return 'brass';
 }
 
-function formatTitleCaseName(tokens) {
-  const formatted = tokens.map((token, index) => {
-    // A trailing single letter or number becomes "Style A/B/C" or "Style 2/3"
-    if (index === tokens.length - 1) {
-      if (/^[a-zA-Z]$/.test(token)) {
-        return `Style ${token.toUpperCase()}`;
-      }
-      if (/^\d+$/.test(token)) {
-        return `Style ${token}`;
-      }
+function nameFromFilename(filename) {
+  const bareName = path.basename(filename, path.extname(filename))
+    .replace(/-\d+$/, '')
+    .replace(/-(gold|brass|yellow|black|dark|graphite|silver|nickel|steel|antique|bronze|two-tone)$/i, '');
+  return titleCase(bareName);
+}
+
+function findImages(directory) {
+  const results = [];
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const filePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      // Thumbnails are referenced by their full-size sibling, not catalogued.
+      if (entry.name.toLowerCase() !== 'thumb') results.push(...findImages(filePath));
+    } else if (entry.isFile() && IMAGE_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+      results.push(filePath);
     }
-    return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
-  });
-  return formatted.join(' ');
+  }
+  return results;
 }
 
-function generateDescription(category, finish, name) {
-  const finishText = finish.toLowerCase();
-  switch (category) {
-    case 'Tower Bolts':
-      return `Architectural heavy-duty barrel bolt with smooth manual throw, presented in ${finishText} finish.`;
-    case 'Finials':
-      return `Architectural turned finial terminal with refined profile, presented in ${finishText} finish.`;
-    case 'Plates':
-      return `Architectural escutcheon plate with precision edge contour, presented in ${finishText} finish.`;
-    case 'Mortise Locks':
-      return `Architectural mortise lock faceplate and hardware mechanism, presented in ${finishText} finish.`;
-    case 'Door Knockers':
-      return `Heavy entrance door knocker with articulated striker ring, presented in ${finishText} finish.`;
-    case 'Decorative Handles':
-      return `Decorative architectural disc handle with embossed relief detailing, presented in ${finishText} finish.`;
-    case 'Pulls':
-      return `Linear architectural pull handle designed for cabinet suites and doors, presented in ${finishText} finish.`;
-    case 'Handles':
-    default:
-      return `Architectural lever handle featuring tactile detailing and balanced hand feel, presented in ${finishText} finish.`;
-  }
+function buildCatalog(imageFiles) {
+  return imageFiles.sort((a, b) => a.localeCompare(b)).map((filePath, index) => {
+    const relativePath = toPosixPath(path.relative(IMAGES_DIR, filePath));
+    const [folderName] = relativePath.split('/');
+    const category = CATEGORY_BY_FOLDER[folderName] || 'accessories';
+    const filename = path.basename(filePath);
+    const thumbnailPath = path.join(path.dirname(filePath), 'thumb', filename);
+    const cleanFullPath = path.join(CLEAN_IMAGES_DIR, ...relativePath.split('/'));
+    const useCleanImage = fs.existsSync(cleanFullPath);
+    const assetRoot = useCleanImage ? 'images-clean' : 'images';
+    const full = `/${assetRoot}/${relativePath}`;
+
+    return {
+      id: index + 1,
+      slug: path.basename(filename, path.extname(filename)).toLowerCase(),
+      name: nameFromFilename(filename),
+      // The directory is the source of truth for frontend category filters.
+      category,
+      finish: finishFromFilename(filename),
+      background: 'white',
+      images: [{
+        full,
+        thumb: fs.existsSync(thumbnailPath)
+          ? `/${assetRoot}/${toPosixPath(path.relative(IMAGES_DIR, thumbnailPath))}`
+          : full,
+      }],
+    };
+  });
 }
 
 function run() {
-  try {
-    if (!fs.existsSync(IMAGES_DIR)) {
-      console.log('Images folder not found. Generating empty product dataset.');
-      writeOutput([]);
-      return;
-    }
+  if (!fs.existsSync(IMAGES_DIR)) throw new Error(`Images folder not found: ${IMAGES_DIR}`);
 
-    const files = fs.readdirSync(IMAGES_DIR);
-    const validExtensions = new Set(['.webp', '.png', '.jpg', '.jpeg']);
-    const imageFiles = files.filter((f) => validExtensions.has(path.extname(f).toLowerCase()));
-
-    if (imageFiles.length === 0) {
-      console.log('No valid image files found in /public/images/. Generating empty product dataset.');
-      writeOutput([]);
-      return;
-    }
-
-    // Group by base name to deduplicate: if two files share the same base name, keep the .webp and skip the other
-    const baseMap = new Map();
-    for (const file of imageFiles) {
-      const ext = path.extname(file).toLowerCase();
-      const baseName = path.basename(file, ext);
-      if (!baseMap.has(baseName)) {
-        baseMap.set(baseName, file);
-      } else {
-        const existing = baseMap.get(baseName);
-        const existingExt = path.extname(existing).toLowerCase();
-        if (ext === '.webp' && existingExt !== '.webp') {
-          baseMap.set(baseName, file);
-        }
-      }
-    }
-
-    const deduplicatedFiles = Array.from(baseMap.values()).sort();
-    const products = [];
-
-    for (let i = 0; i < deduplicatedFiles.length; i++) {
-      const file = deduplicatedFiles[i];
-      const ext = path.extname(file).toLowerCase();
-      const baseName = path.basename(file, ext);
-
-      // Strip leading numeric code (regex ^\d+(-\d+)*-)
-      const stripped = baseName.replace(/^\d+(-\d+)*-/, '');
-      const tokens = stripped.split(/[-_]+/).filter(Boolean);
-
-      const name = formatTitleCaseName(tokens);
-      const slug = stripped.toLowerCase();
-      const category = determineCategory(tokens);
-      const finish = determineFinish(tokens);
-      const tier = ext === '.webp' || ext === '.png' ? 'ready' : 'extra';
-      const opaque = ext === '.jpg' || ext === '.jpeg';
-      const image = `/images/${file}`;
-      const description = generateDescription(category, finish, name);
-
-      products.push({
-        id: `prod-${slug}`,
-        slug,
-        name,
-        category,
-        finish,
-        image,
-        tier,
-        opaque,
-        description,
-      });
-    }
-
-    writeOutput(products);
-    console.log(`Successfully generated ${products.length} products in ${OUTPUT_FILE}`);
-  } catch (err) {
-    console.error('Error during product generation (safely caught):', err);
-    try {
-      writeOutput([]);
-    } catch {
-      // Never throw
-    }
+  const imageFiles = findImages(IMAGES_DIR);
+  if (imageFiles.length === 0) {
+    // Never replace a live catalogue with an empty dataset.
+    throw new Error(`No product images found below ${IMAGES_DIR}; catalog was left unchanged.`);
   }
+
+  const catalog = buildCatalog(imageFiles);
+  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+  fs.writeFileSync(OUTPUT_FILE, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
+  console.log(`Generated ${catalog.length} catalog products in ${OUTPUT_FILE}`);
 }
 
-function writeOutput(products) {
-  const content = `/**
- * AUTO-GENERATED BY scripts/generate-products.mjs
- * DO NOT EDIT MANUALLY.
- */
-
-export interface GeneratedProduct {
-  id: string;
-  slug: string;
-  name: string;
-  category: string;
-  finish: string;
-  image: string;
-  tier: 'ready' | 'extra';
-  opaque: boolean;
-  price?: number;
-  description: string;
+try {
+  run();
+} catch (error) {
+  console.error(`Catalog generation failed: ${error.message}`);
+  process.exitCode = 1;
 }
-
-export const GENERATED_PRODUCTS: GeneratedProduct[] = ${JSON.stringify(products, null, 2)};
-`;
-
-  const dir = path.dirname(OUTPUT_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(OUTPUT_FILE, content, 'utf-8');
-}
-
-run();

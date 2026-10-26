@@ -1,0 +1,21 @@
+{
+  "processed_rows": 153,
+  "images_per_category": {
+    "decorative-handles": 28,
+    "uncategorized": 28,
+    "cabinet-handles": 23,
+    "knobs": 6,
+    "main-door-pulls": 19,
+    "mortise-locks": 8,
+    "door-handles": 39,
+    "accessories": 2
+  },
+  "whitened": 0,
+  "kept": 153,
+  "cropped": 0,
+  "skipped": 0,
+  "needs_better_photo": 0,
+  "total_output_mb": 12.62,
+  "rembg_available": false,
+  "problems": []
+}
