@@ -18,13 +18,13 @@ export default function Hero({ onExploreClick }: HeroProps) {
 
   return (
     <section data-reveal-section className="relative min-h-screen w-full flex flex-col justify-center items-center overflow-hidden pt-20 pb-16 lg:pt-24 lg:pb-20 bg-[#000000]">
-      {/* Soft gold ambient glow behind 3D canvas */}
+      {/* Soft gold ambient glow behind hero stage */}
       <div
         aria-hidden="true"
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[720px] bg-[#C9A24B]/15 rounded-full blur-[170px] pointer-events-none"
       />
 
-      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col items-center text-center">
+      <div className="max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 flex flex-col items-center text-center">
         {/* Apple-style Centered Text Stack */}
         <div
           data-reveal
@@ -67,10 +67,10 @@ export default function Hero({ onExploreClick }: HeroProps) {
           </div>
         </div>
 
-        {/* 3D Hardware Canvas: Centered & Large */}
+        {/* Flagship Hardware Stage & 3D Interactive Canvas: Centered & Large */}
         <div
           data-reveal
-          className="w-full max-w-[920px] mt-8 sm:mt-12 relative flex items-center justify-center"
+          className="w-full max-w-[1000px] mt-8 sm:mt-12 relative flex items-center justify-center"
         >
           <div className="w-full">
             <Hero3DHandle />

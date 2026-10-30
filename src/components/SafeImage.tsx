@@ -21,11 +21,11 @@ interface SafeImageProps {
  * SafeImage component adhering to DECORIUM specifications:
  * - Lazy loading by default (eager above the fold when priority=true)
  * - decoding="async"
- * - aspect-ratio 3/4
+ * - aspect-ratio optimized (4/4.2) for maximum product visibility without clipping
  * - Soft fade-in (transition-opacity duration-500)
  * - onError fallback block displaying the product name
  * - Never crops, stretches or upscales (object-contain, max-w-full, max-h-full)
- * - Dynamic image panel by data (opaque ? stone panel with multiply blend : dark radial panel with soft drop-shadow), both 28px radius.
+ * - Dynamic image panel by data (opaque ? stone panel with multiply blend : dark radial panel with soft drop-shadow), both 24px radius.
  */
 export default function SafeImage({
   src,
@@ -49,11 +49,11 @@ export default function SafeImage({
   // if opaque is true: stone panel (#EDE8DF) with mix-blend-mode: multiply
   const panelBgClass = opaque
     ? 'bg-[#EDE8DF] border border-[#C9A24B]/15'
-    : 'bg-[radial-gradient(circle_at_center,_#2A2A2E_0%,_#111113_100%)] border border-white/[0.08]';
+    : 'bg-[radial-gradient(circle_at_center,_#26262A_0%,_#111113_100%)] border border-white/[0.08]';
 
   return (
     <div
-      className={`relative w-full aspect-[3/4] rounded-[28px] flex items-center justify-center overflow-hidden p-5 sm:p-6 select-none ${panelBgClass} ${className}`}
+      className={`relative w-full aspect-[4/4.2] rounded-[24px] flex items-center justify-center overflow-hidden p-3 sm:p-4 select-none ${panelBgClass} ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -77,9 +77,9 @@ export default function SafeImage({
             decoding="async"
             onLoad={() => setIsLoaded(true)}
             onError={() => setHasError(true)}
-            className={`w-full h-full object-contain p-2 sm:p-3 transition-transform duration-500 ease-out ${
+            className={`w-full h-full object-contain p-1 sm:p-1.5 transition-transform duration-500 ease-out ${
               isLoaded ? 'opacity-100' : 'opacity-0'
-            } ${isZoomable && isHovered ? 'scale-[1.01]' : 'scale-100'} ${
+            } ${isZoomable && isHovered ? 'scale-[1.04]' : 'scale-100'} ${
               opaque
                 ? '[mix-blend-mode:multiply]'
                 : 'drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]'

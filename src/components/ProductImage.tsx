@@ -38,8 +38,8 @@ export default function ProductImage({ product, className = '', isZoomable = fal
           src={product.image}
           alt={product.name}
           onError={() => setImageError(true)}
-          className={`w-full h-full object-contain p-4 transition-transform duration-500 ease-out ${
-            isZoomable && isHovered ? 'scale-110' : 'scale-100'
+          className={`w-full h-full object-contain p-2 sm:p-2.5 transition-transform duration-500 ease-out ${
+            isZoomable && isHovered ? 'scale-105' : 'scale-100'
           }`}
           loading="lazy"
         />
